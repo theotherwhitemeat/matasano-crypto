@@ -44,20 +44,48 @@ def xor_cipher(hexin):
     # 1. xor hexin with each char in string.lowercase
     # 2. score the hex string output according to frequency
     candidates = []
-    hexbytes = bytearray(hexin, 'hex')
     for char in string.printable:
-        newbytes = bytearray()
-        for byte in hexbytes:
-            result = xor(byte, ord(char))
-            newbytes.append(result)
-        modifiedText = newbytes.decode()
-        if all(char in string.printable for char in modifiedText):
-            candidates.append((score_letter_frequency(modifiedText), modifiedText))
+        results = ''
+        for text in hexin.decode("hex"):
+            result = xor(ord(text), ord(char))
+            results += chr(result) 
+        if all(char in string.printable for char in results):
+            candidates.append((score_letter_frequency(results), results))
 
-    print max(candidates)
+    return max(candidates)[-1]
 
 def score_letter_frequency(inputString):
     """ Returns: letter frequency score of an arbitrary string. """
+
+    # From wikipedia
+    letter_frequencies = {
+        'a': 8.167,
+        'b': 1.492,
+        'c': 2.782,
+        'd': 4.253,
+        'e': 12.702,
+        'f': 2.228,
+        'g': 2.015,
+        'h': 6.094,
+        'i': 6.966,
+        'j': 0.153,
+        'k': 0.772,
+        'l': 4.025,
+        'm': 2.406,
+        'n': 6.749,
+        'o': 7.507,
+        'p': 1.929,
+        'q': 0.095,
+        'r': 5.987,
+        's': 6.327,
+        't': 9.056,
+        'u': 2.758,
+        'v': 0.978,
+        'w': 2.360,
+        'x': 0.150,
+        'y': 1.974,
+        'z': 0.074,
+    }
 
     inputString = inputString.lower()
     letterCount = {}
@@ -77,7 +105,7 @@ def score_letter_frequency(inputString):
     for letter in letterCount:
         letterCount[letter] /= count
 
-    # Score the results, algorithm gratuitously borrowed
+    # Score the results, Bhattacharyya coefficient algorithm gratuitously borrowed
     #  from https://github.com/tomdeakin/Matasano-Crypto-Challenges/blob/master/textutils.py
     totalscore = 0.0
     for letter in letter_frequencies:
@@ -89,7 +117,7 @@ def score_letter_frequency(inputString):
 
 def test_xor_cipher():
     result = xor_cipher("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
-    assert result == None
+    assert result == "Cooking MC's like a pound of bacon"
 
 #######################
 ### Ad-hoc test runner
@@ -110,34 +138,6 @@ if __name__ == "__main__":
 
 
 #####################
-###  Constants
+###  References
 #####################
-
-letter_frequencies = {
-    'a': 8.167,
-    'b': 1.492,
-    'c': 2.782,
-    'd': 4.253,
-    'e': 12.702,
-    'f': 2.228,
-    'g': 2.015,
-    'h': 6.094,
-    'i': 6.966,
-    'j': 0.153,
-    'k': 0.772,
-    'l': 4.025,
-    'm': 2.406,
-    'n': 6.749,
-    'o': 7.507,
-    'p': 1.929,
-    'q': 0.095,
-    'r': 5.987,
-    's': 6.327,
-    't': 9.056,
-    'u': 2.758,
-    'v': 0.978,
-    'w': 2.360,
-    'x': 0.150,
-    'y': 1.974,
-    'z': 0.074,
-}
+# - http://en.wikipedia.org/wiki/XOR_cipher
