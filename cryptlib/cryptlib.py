@@ -1,3 +1,6 @@
+import math
+import string
+
 ##########################
 ### Informative decorator
 ##########################
@@ -24,7 +27,11 @@ def test_hex_to_base64():
 # Set 1, Challenge 2
 def xor(in1, in2):
     """ Returns: numeric hex XOR of input hex strings: in1 and in2. """
-    return int(in1, base=16) ^ int(in2, base=16)
+    if isinstance(in1, str):
+        in1 = int(in1, base=16)
+    if isinstance(in2, str):
+        in2 = int(in2, base=16)
+    return in1 ^ in2
 
 def test_xor():
     result = xor('1c0111001f010100061a024b53535009181c','686974207468652062756c6c277320657965')
@@ -36,12 +43,49 @@ def xor_cipher(hexin):
         on an arbitrary hex string. """
     # 1. xor hexin with each char in string.lowercase
     # 2. score the hex string output according to frequency
-    import string
-    import binascii
+    candidates = []
+    bytes = bytearray(hexin, 'hex')
     for char in string.printable:
-        char = char.encode("hex")
-        result = hex(xor(hexin, char))
-        print binascii.b2a_hex(result)
+        newbytes = bytearray()
+        for byte in bytes:
+            result = xor(byte, ord(char))
+            newbytes.append(result)
+        modifiedText = newbytes.decode()
+        if all(char in string.printable for char in modifiedText):
+            candidates.append((score_letter_frequency(modifiedText), modifiedText))
+
+    print max(candidates)
+
+def score_letter_frequency(inputString):
+    """ Returns: letter frequency score of an arbitrary string. """
+
+    inputString = inputString.lower()
+    letterCount = {}
+    count = 0
+    letters = set(string.lowercase)
+
+    # Add up letter counts
+    for char in inputString:
+        if char in letters:
+            count += 1
+        if char in letterCount:
+            letterCount[char] += 1.
+        else:
+            letterCount[char] = 1.
+
+    # Determine the total letter distribution
+    for letter in letterCount:
+        letterCount[letter] /= count
+
+    # Score the results, algorithm gratuitously borrowed
+    #  from https://github.com/tomdeakin/Matasano-Crypto-Challenges/blob/master/textutils.py
+    totalscore = 0.0
+    for letter in letter_frequencies:
+        if letter not in letterCount:
+            letterCount[letter] = 0.0
+        totalscore += math.sqrt(letterCount[letter] * letter_frequencies[letter])
+    return totalscore
+
 
 def test_xor_cipher():
     result = xor_cipher("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
