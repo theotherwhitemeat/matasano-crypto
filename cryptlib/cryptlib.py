@@ -44,10 +44,10 @@ def xor_cipher(hexin):
     # 1. xor hexin with each char in string.lowercase
     # 2. score the hex string output according to frequency
     candidates = []
-    bytes = bytearray(hexin, 'hex')
+    hexbytes = bytearray(hexin, 'hex')
     for char in string.printable:
         newbytes = bytearray()
-        for byte in bytes:
+        for byte in hexbytes:
             result = xor(byte, ord(char))
             newbytes.append(result)
         modifiedText = newbytes.decode()
