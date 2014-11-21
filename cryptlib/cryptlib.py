@@ -1,4 +1,5 @@
 import math
+import os
 import string
 
 ##########################
@@ -52,7 +53,9 @@ def xor_cipher(hexin):
         if all(char in string.printable for char in results):
             candidates.append((score_letter_frequency(results), results))
 
-    return max(candidates)[-1]
+    if candidates:
+        return max(candidates)[-1]
+
 
 def score_letter_frequency(inputString):
     """ Returns: letter frequency score of an arbitrary string. """
@@ -118,6 +121,25 @@ def score_letter_frequency(inputString):
 def test_xor_cipher():
     result = xor_cipher("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
     assert result == "Cooking MC's like a pound of bacon"
+
+
+# Set 1, Challenge 4
+def find_xord_string(strings):
+    scores = {}
+    for item in strings:
+        max_item = xor_cipher(item)
+        # string may not be readable, so dodge None returns
+        if max_item:
+            scores[score_letter_frequency(max_item)] = max_item
+    return max(scores.items())
+
+
+def test_find_xord_string():
+    stringFile = os.path.join('..', 'rsc', 'set4.txt')
+    with open(stringFile, 'r') as infile:
+        strings = [item.strip() for item in infile.readlines()]
+    score, resultString = find_xord_string(strings)
+    assert resultString == 'Now that the party is jumping\n'
 
 #######################
 ### Ad-hoc test runner
