@@ -7,13 +7,20 @@ import string
 ##########################
 
 class hexint(int):
-    def __init__(self, x, base=None):
-        if not base:
-            if isinstance(x, str):
-                x = ord(x)
-        super(int, self).__init__(x, base=base)
+    """ Python doesn't have support for a class that easily outputs
+        information about ints as well as hex strings without the leading
+        0x prefix, which means a lot of extra conversions must be done.
+        This class is meant to simplify these operations; performance
+        must be awful. """
+    # ints are immutable, so we're using __new__
+    def __new__(cls, *args, **kwargs):
+        # if 'base' is not specified, cast our chr to an int
+        if not kwargs and isinstance(args[0], str):
+            args = (ord(args[0]),)
+        return super(hexint, cls).__new__(cls, *args, **kwargs)
     @property
     def hstr(self):
+        """ Returns: hex string, without the leading '0x'. """
         return hex(self.real).split('x')[-1]
 
 
@@ -153,7 +160,7 @@ def repeating_xor(repeatingKey, value):
     keyRange = len(repeatingKey)
     for i, char in enumerate(value):
         key = repeatingKey[i % keyRange]
-        newvalues.append(hex((ord(char) ^ ord(key))).split('x')[-1])
+        newvalues.append(hexint(hexint(char) ^ hexint(key)).hstr)
     return ''.join(newvalues)
 
 def test_repeating_xor():
