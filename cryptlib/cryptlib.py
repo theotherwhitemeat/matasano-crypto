@@ -3,12 +3,18 @@ import os
 import string
 
 ##########################
-### Informative decorator
+### Helper class for hex ops
 ##########################
 
-def challenge():
-    pass
-
+class hexint(int):
+    def __init__(self, x, base=None):
+        if not base:
+            if isinstance(x, str):
+                x = ord(x)
+        super(int, self).__init__(x, base=base)
+    @property
+    def hstr(self):
+        return hex(self.real).split('x')[-1]
 
 
 ######################
@@ -140,6 +146,24 @@ def test_find_xord_string():
         strings = [item.strip() for item in infile.readlines()]
     score, resultString = find_xord_string(strings)
     assert resultString == 'Now that the party is jumping\n'
+
+# Set 1, Challenge 5
+def repeating_xor(repeatingKey, value):
+    newvalues = []
+    keyRange = len(repeatingKey)
+    for i, char in enumerate(value):
+        key = repeatingKey[i % keyRange]
+        newvalues.append(hex((ord(char) ^ ord(key))).split('x')[-1])
+    return ''.join(newvalues)
+
+def test_repeating_xor():
+    testvalue = """Burning 'em, if you ain't quick and nimble
+I go crazy when I hear a cymbal"""
+    testkey = "ICE"
+    targetResult = """b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272
+a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f"""
+
+    result = repeating_xor(testkey, testvalue)
 
 #######################
 ### Ad-hoc test runner
