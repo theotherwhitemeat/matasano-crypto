@@ -21,8 +21,10 @@ class hexint(int):
     @property
     def hstr(self):
         """ Returns: hex string, without the leading '0x'. """
-        return hex(self.real).split('x')[-1]
-
+        val = hex(self.real).split('x')[-1]
+        if len(val) == 1:
+            val = '0' + val
+        return val
 
 ######################
 ### Crypto functions 
@@ -42,13 +44,13 @@ def test_hex_to_base64():
 def xor(in1, in2):
     """ Returns: numeric hex XOR of input hex strings: in1 and in2. """
     if isinstance(in1, str):
-        in1 = int(in1, base=16)
+        in1 = hexint(in1)
     if isinstance(in2, str):
-        in2 = int(in2, base=16)
+        in2 = hexint(in2)
     return in1 ^ in2
 
 def test_xor():
-    result = xor('1c0111001f010100061a024b53535009181c','686974207468652062756c6c277320657965')
+    result = xor(int('1c0111001f010100061a024b53535009181c', base=16), int('686974207468652062756c6c277320657965', base=16))
     assert result == 0x746865206b696420646f6e277420706c6179L
 
 # Set 1, Challenge 3
@@ -68,7 +70,6 @@ def xor_cipher(hexin):
 
     if candidates:
         return max(candidates)[-1]
-
 
 def score_letter_frequency(inputString):
     """ Returns: letter frequency score of an arbitrary string. """
@@ -130,11 +131,9 @@ def score_letter_frequency(inputString):
         totalscore += math.sqrt(letterCount[letter] * letter_frequencies[letter])
     return totalscore
 
-
 def test_xor_cipher():
     result = xor_cipher("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
     assert result == "Cooking MC's like a pound of bacon"
-
 
 # Set 1, Challenge 4
 def find_xord_string(strings):
@@ -145,7 +144,6 @@ def find_xord_string(strings):
         if max_item:
             scores[score_letter_frequency(max_item)] = max_item
     return max(scores.items())
-
 
 def test_find_xord_string():
     stringFile = os.path.join('..', 'rsc', 'set4.txt')
@@ -167,15 +165,15 @@ def test_repeating_xor():
     testvalue = """Burning 'em, if you ain't quick and nimble
 I go crazy when I hear a cymbal"""
     testkey = "ICE"
-    targetResult = """b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272
-a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f"""
-
+    targetResult = "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272"
+    targetResult += "a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f"
     result = repeating_xor(testkey, testvalue)
+    assert result == targetResult
+
 
 #######################
 ### Ad-hoc test runner
 #######################
-
 
 def runtests():
     import inspect
