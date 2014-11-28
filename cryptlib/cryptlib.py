@@ -21,10 +21,7 @@ class hexint(int):
     @property
     def hstr(self):
         """ Returns: hex string, without the leading '0x'. """
-        val = hex(self.real).split('x')[-1]
-        if len(val) == 1:
-            val = '0' + val
-        return val
+        return format(self.real, '02x')
 
 ######################
 ### Crypto functions 
