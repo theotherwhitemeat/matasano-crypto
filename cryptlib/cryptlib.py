@@ -64,13 +64,11 @@ def xor_cipher(hexin):
             results += chr(result) 
         if all(char in string.printable for char in results):
             candidates.append((score_letter_frequency(results), results))
-
     if candidates:
         return max(candidates)[-1]
 
 def score_letter_frequency(inputString):
     """ Returns: letter frequency score of an arbitrary string. """
-
     # From wikipedia
     letter_frequencies = {
         'a': 8.167,
@@ -143,7 +141,8 @@ def find_xord_string(strings):
     return max(scores.items())
 
 def test_find_xord_string():
-    stringFile = os.path.join('..', 'rsc', 'set4.txt')
+    stringFile = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), '..', 'rsc', 'set4.txt')
     with open(stringFile, 'r') as infile:
         strings = [item.strip() for item in infile.readlines()]
     score, resultString = find_xord_string(strings)
@@ -167,6 +166,25 @@ I go crazy when I hear a cymbal"""
     result = repeating_xor(testkey, testvalue)
     assert result == targetResult
 
+# Set 1, Challenge 6
+def bit_count(i):
+    return bin(i).count("1")
+
+def test_bit_count():
+    assert bit_count(1) == 1
+    assert bit_count(2) == 1
+    assert bit_count(3) == 2
+    assert bit_count(63) == 6
+
+def hamming_distance(str1, str2):
+    distance = 0
+    for i, k in zip(str1, str2):
+        distance += bit_count(ord(i) ^ ord(k))
+    return distance
+
+def test_hamming_distance():
+    test_val = hamming_distance("this is a test", "wokka wokka!!!")
+    assert test_val == 37
 
 #######################
 ### Ad-hoc test runner
